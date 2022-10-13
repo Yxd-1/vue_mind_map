@@ -1,9 +1,10 @@
 <template>
   <div class="login_container">
-    <div class="login_box">
+    <!-- 登录 -->
+    <div class="login_box" v-show="loginMode">
       <!-- 图片 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt="" />
+        <img src="../assets/dog.png" alt="" />
       </div>
       <!-- 表单 -->
       <el-form
@@ -31,8 +32,44 @@
         <!-- 按钮区域 -->
         <el-form-item class="btns">
           <el-button type="primary" @click="login">登录</el-button>
-          <el-button type="success">注册</el-button>
+          <el-button type="success" @click="register">注册</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- 注册 -->
+    <div class="login_box" v-show="!loginMode">
+      <!-- 图片 -->
+      <div class="avatar_box">
+        <img src="../assets/dog.png" alt="" />
+      </div>
+      <!-- 表单 -->
+      <el-form
+        :model="loginForm"
+        :rules="loginFormRules"
+        ref="loginFormRef"
+        label-width="0px"
+        class="login_form"
+      >
+        <!-- 用户名 -->
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginForm.username"
+            prefix-icon="el-icon-user"
+          ></el-input>
+        </el-form-item>
+        <!-- 密码 -->
+        <el-form-item prop="password">
+          <el-input
+            v-model="loginForm.password"
+            prefix-icon="el-icon-lock"
+            type="password"
+          ></el-input>
+        </el-form-item>
+        <!-- 按钮区域 -->
+        <el-form-item class="btns">
+          <el-button type="primary" @click="submit">完成</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -40,9 +77,12 @@
 </template>
 
 <script>
+import router from "@/router";
+
 export default {
   data() {
     return {
+      loginMode: true,
       // 登陆表单的数据绑定对象
       loginForm: {
         username: "",
@@ -76,13 +116,47 @@ export default {
       this.$refs.loginFormRef.resetFields();
     },
 
-    //登录方法
+    // 登录方法
     login() {
       this.$refs.loginFormRef.validate(async (valid) => {
         // console.log(valid);
         if (!valid) return;
-        const result = await this.$http.post("users/login", this.loginForm);
-        console.log(result);
+        const { data: res } = await this.$http.post(
+          "users/login",
+          this.loginForm
+        );
+        console.log(res);
+        if (res.code != 1) return this.$message.error(res.msg);
+        this.$message.success("登陆成功");
+
+        // 登陆成功后保存token到客户端的sessionStorage中
+        window.sessionStorage.setItem("token", res.data.token);
+        // 跳转
+        this.$router.push("/home");
+      });
+    },
+
+    // 注册方法
+    register() {
+      this.loginMode = false;
+    },
+
+    // 注册完成跳转
+    submit() {
+      this.$refs.loginFormRef.validate(async (valid) => {
+        // console.log(valid);
+        if (!valid) return;
+        const { data: res } = await this.$http.post(
+          "users/register",
+          this.loginForm
+        );
+
+        console.log(res);
+        if (res.code != 1) return this.$message.error(res.msg);
+
+        // 成功后跳转
+        this.$message.success("注册成功，请登录");
+        this.loginMode = true;
       });
     },
   },
@@ -91,19 +165,31 @@ export default {
 
 <style lang="less" scoped>
 .login_container {
-  background-color: rgb(42, 93, 174);
+  // 网上抄的，反正最后图片能完全显示
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
+  min-width: 1000px;
+  background: url(../assets/background1.jpg); /*图片路径*/
+  background-repeat: no-repeat;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -o-background-size: cover;
+  background-position: center 0;
 }
 
 .login_box {
-  width: 450px;
+  width: 400px;
   height: 300px;
   background-color: #fff;
-  border-radius: 3px;
+  border-radius: 20px;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  opacity: 0.85;
 
   .avatar_box {
     height: 130px;
