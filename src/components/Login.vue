@@ -1,7 +1,7 @@
 <template>
   <div class="login_container">
     <!-- 登录 -->
-    <div class="login_box" v-show="loginMode">
+    <div class="login_box">
       <!-- 图片 -->
       <div class="avatar_box">
         <img src="../assets/dog.png" alt="" />
@@ -37,42 +37,6 @@
         </el-form-item>
       </el-form>
     </div>
-
-    <!-- 注册 -->
-    <div class="login_box" v-show="!loginMode">
-      <!-- 图片 -->
-      <div class="avatar_box">
-        <img src="../assets/dog.png" alt="" />
-      </div>
-      <!-- 表单 -->
-      <el-form
-        :model="loginForm"
-        :rules="loginFormRules"
-        ref="loginFormRef"
-        label-width="0px"
-        class="login_form"
-      >
-        <!-- 用户名 -->
-        <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            prefix-icon="el-icon-user"
-          ></el-input>
-        </el-form-item>
-        <!-- 密码 -->
-        <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            prefix-icon="el-icon-lock"
-            type="password"
-          ></el-input>
-        </el-form-item>
-        <!-- 按钮区域 -->
-        <el-form-item class="btns">
-          <el-button type="primary" @click="submit">完成</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
   </div>
 </template>
 
@@ -82,7 +46,6 @@ import router from "@/router";
 export default {
   data() {
     return {
-      loginMode: true,
       // 登陆表单的数据绑定对象
       loginForm: {
         username: "",
@@ -138,26 +101,7 @@ export default {
 
     // 注册方法
     register() {
-      this.loginMode = false;
-    },
-
-    // 注册完成跳转
-    submit() {
-      this.$refs.loginFormRef.validate(async (valid) => {
-        // console.log(valid);
-        if (!valid) return;
-        const { data: res } = await this.$http.post(
-          "users/register",
-          this.loginForm
-        );
-
-        console.log(res);
-        if (res.code != 1) return this.$message.error(res.msg);
-
-        // 成功后跳转
-        this.$message.success("注册成功，请登录");
-        this.loginMode = true;
-      });
+      this.$router.push("/register");
     },
   },
 };
