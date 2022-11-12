@@ -18,6 +18,11 @@ Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
 
+// // 告诉服务器去哪里找静态资源文件
+// const path = require('path');
+// app.use(express.static(path.join(__dirname, '/assets')));
+
+
 new Vue({
   router,
   render: h => h(App)

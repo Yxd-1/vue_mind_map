@@ -2,7 +2,11 @@
   <el-container class="home-container">
     <!-- 头部区域 -->
     <el-header>
-      <img src="../assets/logo_small.svg" />
+      <img
+        src="../assets/logo_small.svg"
+        style="cursor: pointer"
+        @click="backhome"
+      />
       <span> 我的文件 </span>
       <el-button type="primary" icon="el-icon-user" circle></el-button>
     </el-header>
@@ -13,14 +17,11 @@
         <el-row class="tac">
           <el-col>
             <!-- 新增按钮 -->
-            <el-button type="primary" class="new" @click="newFile"
+            <el-button type="primary" class="new" @click="createFile"
               >新建</el-button
             >
             <!-- 选项菜单 -->
-            <el-menu
-              class="el-menu-vertical-demo"
-              :router="true"
-            >
+            <el-menu class="el-menu-vertical-demo" :router="true">
               <!-- 一级目录 -->
               <el-menu-item index="/files">
                 <i class="el-icon-house"></i>
@@ -45,35 +46,22 @@
 </template>
 
 <script>
+import router from "@/router";
 export default {
   data() {
-    return {
-      menulist: [],
-    };
+    return {};
   },
-  created() {
-    // this.getMenuList()
-  },
+  created() {},
   methods: {
-    //获取菜单
-    // async getMenuList(){
-    //   const {data: res} = await this.$http.get('menus');
-    //   if(res.code !== 1) return this.$message.error(res.msg)
-    //   this.menulist = res.data
-    // }
+    // 返回起始页面
+    backhome() {
+      this.$router.push("/welcome");
+    },
 
     // 新建文件
-    newFile() {},
-
-    // // 切换到file组件
-    // tofiles() {
-    //   this.$router.push("/files");
-    // },
-
-    // // 切换到delete组件
-    // todelete() {
-    //   this.$router.push("/trashbin");
-    // },
+    createFile() {
+      this.$router.push("/mindmap");
+    },
   },
 };
 </script>
@@ -108,17 +96,12 @@ export default {
   color: #000;
   text-align: center;
   height: 100%;
-  padding-left: 0;
 }
 
 .el-main {
   background-color: #f4f4f4;
   color: #333;
   text-align: center;
-}
-
-.el-col {
-  width: 100%;
 }
 
 .new {
@@ -130,10 +113,14 @@ export default {
 }
 
 .el-menu {
-  width: 220px;
-  transform: translateX(-20px);
+  width: 100%;
   background-color: #f4f4f4;
   text-align: left;
-  padding-left: 20%;
+  border-right-width: 0;
+}
+
+.el-menu-vertical-demo {
+  width: 90%;
+  transform: translateX(10%);
 }
 </style>

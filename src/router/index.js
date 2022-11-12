@@ -6,6 +6,8 @@ import Register from "../components/Register";
 import File from "../components/File";
 import TrashBin from "../components/TrashBin";
 import Welcome from "../components/Welcome";
+import MindMap from "../components/MindMap";
+
 
 Vue.use(VueRouter);
 
@@ -33,6 +35,7 @@ const router = new VueRouter({
       ],
     },
     { path: "/register", component: Register },
+    { path: "/mindmap", component: MindMap },
   ],
 });
 
