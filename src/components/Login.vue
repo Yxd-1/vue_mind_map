@@ -7,27 +7,14 @@
         <img src="../assets/dog.png" alt="" />
       </div>
       <!-- 表单 -->
-      <el-form
-        :model="loginForm"
-        :rules="loginFormRules"
-        ref="loginFormRef"
-        label-width="0px"
-        class="login_form"
-      >
+      <el-form :model="loginForm" :rules="loginFormRules" ref="loginFormRef" label-width="0px" class="login_form">
         <!-- 用户名 -->
         <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            prefix-icon="el-icon-user"
-          ></el-input>
+          <el-input v-model="loginForm.username" prefix-icon="el-icon-user"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            prefix-icon="el-icon-lock"
-            type="password"
-          ></el-input>
+          <el-input v-model="loginForm.password" prefix-icon="el-icon-lock" type="password"></el-input>
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
@@ -82,6 +69,11 @@ export default {
     // 登录方法
     login() {
       this.$refs.loginFormRef.validate(async (valid) => {
+        // 纯前端开发时用，无需验证登录
+        window.sessionStorage.setItem("token", "kjad31413nl1123");
+        this.$router.push("/home");
+        return;
+
         // console.log(valid);
         if (!valid) return;
         const { data: res } = await this.$http.post(
@@ -116,7 +108,8 @@ export default {
   width: 100%;
   height: 100%;
   min-width: 1000px;
-  background: url(../assets/background1.jpg); /*图片路径*/
+  background: url(../assets/background1.jpg);
+  /*图片路径*/
   background-repeat: no-repeat;
   background-size: cover;
   -webkit-background-size: cover;
@@ -146,6 +139,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
+
     img {
       width: 100%;
       height: 100%;

@@ -1,5 +1,5 @@
 <template>
-  <el-container class="home-container">
+  <el-container class="home-container">    
     <!-- 头部区域 -->
     <el-header>
       <img
@@ -7,8 +7,6 @@
         style="cursor: pointer"
         @click="backhome"
       />
-      <span> 我的文件 </span>
-      <el-button type="primary" icon="el-icon-user" circle></el-button>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
@@ -17,21 +15,37 @@
         <el-row class="tac">
           <el-col>
             <!-- 新增按钮 -->
-            <el-button type="primary" class="new" @click="createFile"
-              >新建</el-button
-            >
+            <el-button type="primary" class="new" @click="createFile">新建</el-button>
             <!-- 选项菜单 -->
-            <el-menu class="el-menu-vertical-demo" :router="true">
+            <el-menu default-active="$route.path" 
+            class="el-menu-vertical-demo" :router="true" 
+            background-color= rgb(245,217,217)
+            text-color="#606266" 
+            active-text-color="#000000">
               <!-- 一级目录 -->
               <el-menu-item index="/files">
                 <i class="el-icon-house"></i>
-                <span slot="title">我的文件</span>
+                <span slot="title">首页</span>
               </el-menu-item>
               <!-- 一级目录 -->
               <el-menu-item index="/trashbin">
                 <i class="el-icon-delete"></i>
                 <span slot="title">回收站</span>
               </el-menu-item>
+              <!-- 一级目录 -->
+              <el-menu-item index="/users">
+                <i class="el-icon-user"></i>
+                <span slot="title">用户中心</span>
+              </el-menu-item>
+              <!-- 一、二级目录 -->
+              <el-submenu index="7">
+                <template slot="title">
+                 <i class="el-icon-more"></i>
+                 <span>其他</span>
+                </template>
+                <el-menu-item index="/upload"><i class="el-icon-upload"></i>上传</el-menu-item>
+                <el-menu-item index="7-2"><i class="el-icon-upload2"></i>导出</el-menu-item>
+              </el-submenu>
             </el-menu>
           </el-col>
         </el-row>
@@ -62,26 +76,28 @@ export default {
     createFile() {
       this.$router.push("/mindmap");
     },
+
   },
 };
 </script>
 
 <style lang="less" scoped>
+
 .home-container {
   height: 100%;
 }
 
-.el-header {
-  background-color: #fff;
+.el-header{
+  background-color: rgb(241, 187, 192);
+  // background-image: url("D:\xmind\vue_mind_map\src\assets\background.jpg");
   height: 50px;
   padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 3px 2px -2px rgb(200 200 200 / 15%);
-  border-bottom-style: solid;
+  border-bottom-style: double;
   border-width: 2px;
-  border-color: #d6d6d6;
+  border-color: rgb(241, 187, 192);
   > img {
     width: 120px;
     height: 34.362px;
@@ -92,16 +108,21 @@ export default {
 }
 
 .el-aside {
-  background-color: #f4f4f4;
-  color: #000;
+  background-color:rgb(245,217,217);
+  // background-image: url("D:\xmind\vue_mind_map\src\assets\background.jpg");
+  // color: rgb(199, 32, 32);
   text-align: center;
   height: 100%;
 }
 
 .el-main {
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: #ffffff;
+  color: rgb(33, 33, 33);
   text-align: center;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // height: 100%;
 }
 
 .new {
@@ -114,7 +135,8 @@ export default {
 
 .el-menu {
   width: 100%;
-  background-color: #f4f4f4;
+  background-color: rgb(245,217,217);
+  // background-image: url("D:\xmind\vue_mind_map\src\assets\background.jpg");
   text-align: left;
   border-right-width: 0;
 }

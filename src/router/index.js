@@ -7,7 +7,7 @@ import File from "../components/File";
 import TrashBin from "../components/TrashBin";
 import Welcome from "../components/Welcome";
 import MindMap from "../components/MindMap";
-
+import Users from "../components/Users";
 
 Vue.use(VueRouter);
 
@@ -31,6 +31,10 @@ const router = new VueRouter({
         {
           path: "/trashbin",
           component: TrashBin,
+        },
+        {
+          path: "/users",
+          component: Users,
         },
       ],
     },
