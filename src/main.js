@@ -4,6 +4,9 @@ import router from './router'
 import './plugins/element.js'
 // 导入全局样式表
 import './assets/css/global.css'
+// 导入思维导图插件
+import ZmTreeOrg from 'zm-tree-org';
+import "zm-tree-org/lib/zm-tree-org.css";
 
 import axios from 'axios'
 // 配置请求的根路径
@@ -17,6 +20,8 @@ axios.interceptors.request.use(config => {
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
+
+Vue.use(ZmTreeOrg);
 
 // // 告诉服务器去哪里找静态资源文件
 // const path = require('path');

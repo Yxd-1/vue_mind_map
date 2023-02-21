@@ -1,26 +1,45 @@
 <template>
   <div>
-
     <div class="dir">
       <span id="dir_root">我的文件</span>
     </div>
 
     <div class="search-container">
-
       <div class="inputBox">
-        <input type="text" placeholder="输入文件名称" v-model="keywords" @keydown.enter="search" @keyup="getData($event)"
-          @blur="hiddenData">
+        <input
+          type="text"
+          placeholder="输入文件名称"
+          v-model="keywords"
+          @keydown.enter="getData($event)"
+          @keyup="search"
+          @blur="hiddenData"
+        />
         <div class="search"></div>
       </div>
 
-      <span id="btn"><el-button type="success" icon="el-icon-upload" circle @click="gotolink"></el-button></span>
+      <span id="btn"
+        ><el-button
+          type="success"
+          icon="el-icon-upload"
+          circle
+          @click="gotolink"
+        ></el-button
+      ></span>
 
       <el-dialog title="上传本地文件" :visible.sync="dialogFormVisible">
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
           <el-form-item label="请选择文件" label-width="100px">
-            <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple :limit="3"
-              :on-exceed="handleExceed" :file-list="fileList2">
+            <el-upload
+              class="upload-demo"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :before-remove="beforeRemove"
+              multiple
+              :limit="3"
+              :on-exceed="handleExceed"
+              :file-list="fileList2"
+            >
               <el-button size="small" type="primary">点击上传</el-button>
               <!-- <div slot="tip" class="el-upload__tip"><h3>只能上传jpg/png文件,且不超过500kb</h3></div> -->
             </el-upload>
@@ -28,30 +47,33 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+          <el-button type="primary" @click="dialogFormVisible = false"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
-
     </div>
 
     <div>
-      <span id="ss">搜索记录:
-        ​ <span class="search-history" v-for="(item, index) in searchHistory" @click="ressetSearch(item)">
-          ​ {{ item }} &nbsp;
-          ​ </span>
-        ​ <!--  实时的搜索数据显示列表-->
-        <ul class="show_data" v-show="isShow">
-          <li v-for="(item, index) in data" v-bind:key="index">{{ item }}</li>
-        </ul>
-        ​ <!-- 当点击搜索按钮，和按下回车键的时候 ，会把搜索出来的与input框中的字一致的数据展示出来 -->
-        <ul>
-          <li v-for="(item, index) in result" v-bind:key="index">{{ item }}</li>
-        </ul>
+      <span id="ss"
+        >搜索记录:
+        <span
+          class="search-history"
+          v-for="(item, index) in searchHistory"
+          @click="ressetSearch(item)"
+        >
+          {{ item }} &nbsp;
+        </span>
       </span>
     </div>
 
     <div class="file-list">
-      <div class="file-list-item" v-for="fileListItem in fileList" :key="fileListItem.id" @click="openfile">
+      <div
+        class="file-list-item"
+        v-for="fileListItem in fileList"
+        :key="fileListItem.id"
+        @click="openfile"
+      >
         <div class="file-img-container">
           <img :src="fileListItem.imgsrc" alt="" />
         </div>
@@ -63,16 +85,13 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 export default {
   data() {
-
     return {
-
       fileList: [
         {
           id: "1",
@@ -111,17 +130,60 @@ export default {
         },
       ],
 
-      goodsList: ["电磁场", "通信电子线路", "通信原理", "计算机网络技术", "数字信号处理", "软件课设", "JAVA"], //所有的数据
-      keywords: '', //input框绑定的关键字
+      goodsList: [
+        {
+          id: "1",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "电磁场",
+        },
+        {
+          id: "2",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "通信电子线路",
+        },
+        {
+          id: "3",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "通信原理",
+        },
+        {
+          id: "4",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "计算机网络技术",
+        },
+        {
+          id: "5",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "数字信号处理",
+        },
+        {
+          id: "6",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "软件课设",
+        },
+        {
+          id: "7",
+          imgsrc: require("../assets/file_img.png"),
+          themename: "JAVA",
+        },
+      ], //所有的数据
+      keywords: "", //input框绑定的关键字
       result: [], //搜索结果，是一个数组
       data: [], //实时的搜索的数据
-      isShow: false, //判断实时的数据是否要显示  默认是不显示
       searchHistory: [], //搜索记录
 
       dialogFormVisible: false,
 
-      fileList2: [{ name: 'mindmap.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' },
-      { name: 'mindmap2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }]
+      fileList2: [
+        {
+          name: "mindmap.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+        {
+          name: "mindmap2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+      ],
     };
   },
   created() {
@@ -141,13 +203,17 @@ export default {
       console.log(file);
     },
     handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      this.$message.warning(
+        `当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
+          files.length + fileList.length
+        } 个文件`
+      );
     },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     goback() {
-      this.$router.replace('/files');
+      this.$router.replace("/files");
     },
     openfile() {
       this.$router.push("/mindmap");
@@ -159,47 +225,38 @@ export default {
     search() {
       // 每次搜索前 把之前的数据清空
       this.result = [];
-      // 每次输入的时候，让他显示出来
-      this.isShow = true;
       // 遍历拿到item，并判断值是否和input框相似，一样就添加到result数组中
       this.goodsList.map((item, index) => {
-        if (item.includes(this.keywords)) {
+        if (item.themename.includes(this.keywords)) {
           this.result.push(item);
         }
       });
-      // 存数据之前  如果历史记录中有的话，就不让添加  ！取反
-      if (!this.searchHistory.includes(this.keywords)) {
-        // 搜索记录会添加那些的input框的关键字
-        this.searchHistory.push(this.keywords);
-      }
+      this.fileList = this.result;
     },
     // 实时的搜索的数据  根据传的参数，拿到event的对象
     getData(event) {
       // 监听event的事件  当键盘码是13的话，就让实时的列表隐藏
       if (event.keyCode == 13) {
-        this.isShow = false;
-        return; //方法结束，不执行
-      }
-      // 每次搜索前 把之前的数据清空
-      this.data = [];
-      // 当他按下回车的时候也没有，即，不会显示实时更新的一部分
-      this.isShow = true;
-      this.goodsList.map((item, index) => {
-        if (item.includes(this.keywords)) {
-          this.data.push(item);
+        //存数据之前  如果历史记录中有的话，就不让添加  ！取反
+        if (!this.searchHistory.includes(this.keywords)) {
+          // 搜索记录会添加那些的input框的关键字
+          this.searchHistory.push(this.keywords);
         }
-      })
+      }
     },
     // 当他失去焦点的时候，会隐藏实时的列表
     hiddenData() {
-      this.isShow = false;
+      
     },
     // kw就是传过来的值item，意思就是点击历史记录的词，会重新返回到input输入框
     ressetSearch(kw) {
       this.keywords = kw;
+      
+      // 小bug，返回input框后应该再进行一次查询
+      this.search();
     },
     goback() {
-      this.$router.replace('/files');
+      this.$router.replace("/files");
     },
   },
 };
@@ -225,7 +282,7 @@ export default {
 
 .file-list {
   margin-top: 20px;
-  text-align: center;
+  text-align: left;
   vertical-align: top;
 }
 
@@ -282,7 +339,7 @@ export default {
   height: 1.5px;
   background: white;
   transform: rotate(45deg);
-  transition: all .3s;
+  transition: all 0.3s;
 }
 
 .inputBox .search::after {
@@ -297,7 +354,7 @@ export default {
   height: 10px;
   border-radius: 50%;
   border: 2px solid white;
-  transition: all .5s;
+  transition: all 0.5s;
 }
 
 .inputBox input {
@@ -332,19 +389,19 @@ export default {
   cursor: text;
 }
 
-.inputBox input:focus~.search {
+.inputBox input:focus ~ .search {
   right: 0px;
   background: #f60;
   z-index: 6;
 }
 
-.inputBox input:focus~.search::before {
+.inputBox input:focus ~ .search::before {
   top: 0;
   left: 0;
   width: 25px;
 }
 
-.inputBox input:focus~.search::after {
+.inputBox input:focus ~ .search::after {
   top: 0;
   left: 0;
   width: 25px;
