@@ -1,36 +1,70 @@
 <template>
-  <div>
-    <div style="display: flex; padding: 10px 0">
-      <div style="margin-right: 10px">
-        <i-switch v-model="horizontal"></i-switch> 横向
+  <div class="container">
+    <div class="header">
+      <div style="margin-right: 40px">
+        <el-button round @click="back" icon="el-icon-back"></el-button>
       </div>
-      <div style="margin-right: 10px">
-        <i-switch v-model="collapsable"></i-switch> 可收起
+      <!-- 没什么必要 -->
+      <!-- <div style="margin-right: 40px">
+        横向
+        <el-switch
+          v-model="horizontal"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+        >
+        </el-switch>
       </div>
-      <div style="margin-right: 10px">
-        <i-switch v-model="disaled"></i-switch> 禁止编辑
+      <div style="margin-right: 40px">
+        可收起
+        <el-switch v-model="collapsable"></el-switch>
       </div>
-      <div style="margin-right: 10px">
-        <i-switch v-model="onlyOneNode"></i-switch> 仅拖动当前节点
+      <div style="margin-right: 40px">
+        禁止编辑
+        <el-switch v-model="disaled"></el-switch>
       </div>
-      <div style="margin-right: 10px">
-        <i-switch v-model="cloneNodeDrag"></i-switch> 拖动节点副本
+      <div style="margin-right: 40px">
+        仅拖动当前节点
+        <el-switch v-model="onlyOneNode"></el-switch>
+      </div>
+      <div style="margin-right: 40px">
+        拖动节点副本
+        <el-switch v-model="cloneNodeDrag"></el-switch>
+      </div> -->
+      <div style="margin-right: 40px">
+        背景色：
+        <el-select v-model="style.background" placeholder="请选择">
+          <el-option
+            v-for="item in options_background"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+        <!-- <color-picker v-model="style.background" size="small"></color-picker> -->
+        &nbsp; 文字颜色：
+        <el-select v-model="style.color" placeholder="请选择">
+          <el-option
+            v-for="item in options_text"
+            :key="item.value_text"
+            :label="item.label"
+            :value="item.value_text"
+          >
+          </el-option>
+        </el-select>
+        <!-- <color-picker v-model="style.color" size="small"></color-picker>&nbsp; -->
+        &nbsp; 搜索：
+        <el-input
+          type="text"
+          v-model="keyword"
+          placeholder="请输入搜索内容"
+          @keydown.enter="filter"
+          style="width: 200px;"
+        ></el-input>
       </div>
     </div>
-    <div style="padding-bottom: 10px">
-      背景色：
-      <color-picker v-model="style.background" size="small"></color-picker
-      >&nbsp; 文字颜色：
-      <color-picker v-model="style.color" size="small"></color-picker>&nbsp;
-      搜索：
-      <input
-        type="text"
-        v-model="keyword"
-        placeholder="请输入搜索内容"
-        @keydown.enter="filter"
-      />
-    </div>
-    <div style="height: 400px; border: 1px solid #eee">
+
+    <div class="zm-tree-org">
       <zm-tree-org
         ref="tree"
         :data="data"
@@ -79,7 +113,7 @@ export default {
             id: 2,
             pid: 1,
             label: "产品研发部",
-            style: { color: "#fff", background: "#108ffe" },
+            style: this.style,
             expand: false,
             children: [
               {
@@ -142,20 +176,72 @@ export default {
       },
       horizontal: true,
       collapsable: true,
-      onlyOneNode: true,
-      cloneNodeDrag: true,
+      onlyOneNode: false,
+      cloneNodeDrag: false,
       expandAll: true,
       disaled: false,
       style: {
-        background: "#fff",
-        color: "#5e6d82",
+        background: "#e0ffff",
+        color: "#000000",
       },
+      options_background: [
+        {
+          value: "#ffffff",
+          label: "白色",
+        },
+        {
+          value: "#e0ffff",
+          label: "浅蓝色",
+        },
+        {
+          value: "#ffffe0",
+          label: "淡黄色",
+        },
+        {
+          value: "#20b2aa",
+          label: "浅绿色",
+        },
+        {
+          value: "#f1bbc0",
+          label: "淡粉色",
+        },
+      ],
+      options_text: [
+        {
+          value_text: "#000000",
+          label: "黑色",
+        },
+        {
+          value_text: "#ffffff",
+          label: "白色",
+        },
+
+        {
+          value_text: "#e0ffff",
+          label: "浅蓝色",
+        },
+        {
+          value_text: "#20b2aa",
+          label: "浅绿色",
+        },
+        {
+          value_text: "#f1bbc0",
+          label: "淡粉色",
+        },
+      ],
     };
   },
   created() {
-    // this.toggleExpand(this.data, this.expandAll);
+    this.toggleExpand(this.data, this.expandAll);
   },
   methods: {
+    back() {
+      this.$router.push("/files");
+    },
+    refresh() {
+      console.log(this.value_background, this.value_text);
+      console.log(this.style.background, this.style.color);
+    },
     onMenus({ node, command }) {
       console.log(node, command);
     },
@@ -219,3 +305,31 @@ export default {
   },
 };
 </script>
+
+<style lang="less" scoped>
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: white;
+  height: 50px;
+  padding: 0 20px;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-style: double;
+  border-width: 1px;
+  border-color: black;
+}
+
+.zm-tree-org {
+  height: 100%;
+  background-color: #e0ffff;
+  flex: 1;
+}
+</style>

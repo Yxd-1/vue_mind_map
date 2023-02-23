@@ -31,6 +31,7 @@
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
+          <el-button type=" info" @click="back">返回</el-button>
           <el-button type="primary" @click="submit">完成</el-button>
         </el-form-item>
       </el-form>
@@ -88,6 +89,11 @@ export default {
         this.$message.success("注册成功，请登录");
         this.$router.push("/login");
       });
+    },
+
+    // 返回
+    back(){
+      this.$router.push("/login");
     },
   },
 };

@@ -245,13 +245,11 @@ export default {
       }
     },
     // 当他失去焦点的时候，会隐藏实时的列表
-    hiddenData() {
-      
-    },
+    hiddenData() {},
     // kw就是传过来的值item，意思就是点击历史记录的词，会重新返回到input输入框
     ressetSearch(kw) {
       this.keywords = kw;
-      
+
       // 小bug，返回input框后应该再进行一次查询
       this.search();
     },
