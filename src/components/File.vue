@@ -16,42 +16,6 @@
         />
         <div class="search"></div>
       </div>
-
-      <span id="btn"
-        ><el-button
-          type="success"
-          icon="el-icon-upload"
-          circle
-          @click="gotolink"
-        ></el-button
-      ></span>
-
-      <el-dialog title="上传本地文件" :visible.sync="dialogFormVisible">
-        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-          <el-form-item label="请选择文件" label-width="100px">
-            <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              multiple
-              :limit="3"
-              :on-exceed="handleExceed"
-              :file-list="fileList2"
-            >
-              <el-button size="small" type="primary">点击上传</el-button>
-              <!-- <div slot="tip" class="el-upload__tip"><h3>只能上传jpg/png文件,且不超过500kb</h3></div> -->
-            </el-upload>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false"
-            >确 定</el-button
-          >
-        </div>
-      </el-dialog>
     </div>
 
     <div>
@@ -60,6 +24,7 @@
         <span
           class="search-history"
           v-for="(item, index) in searchHistory"
+          :key="index"
           @click="ressetSearch(item)"
         >
           {{ item }} &nbsp;
@@ -72,16 +37,58 @@
         class="file-list-item"
         v-for="fileListItem in fileList"
         :key="fileListItem.id"
-        @click="openfile"
       >
-        <div class="file-img-container">
-          <img :src="fileListItem.imgsrc" alt="" />
-        </div>
-        <div class="file-name">
-          <span>
-            <i class="el-icon-share"></i>
-            <label>{{ fileListItem.themename }}</label>
-          </span>
+        <div style="width: 220px" v-if="fileListItem.deleted == 0">
+          <el-card :body-style="{ padding: '0px' }">
+            <img
+              :src="fileListItem.imgsrc"
+              @click="openfile"
+              class="image"
+              alt=""
+            />
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                padding: 14px;
+              "
+            >
+              <span
+                ><i class="el-icon-share"></i>
+                <label>{{ fileListItem.themename }}</label></span
+              >
+              <el-popover placement="right" width="160" trigger="click">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 0;
+                  "
+                >
+                  <el-button
+                    icon="el-icon-edit"
+                    size="medium"
+                    circle
+                    @click="editName(fileListItem)"
+                    >重命名</el-button
+                  >
+                  <el-button
+                    icon="el-icon-delete"
+                    size="medium"
+                    circle
+                    @click="deleteFile(fileListItem)"
+                    >删除</el-button
+                  >
+                </div>
+                <el-button
+                  slot="reference"
+                  icon="el-icon-more"
+                  size="small"
+                  circle
+                ></el-button>
+              </el-popover>
+            </div>
+          </el-card>
         </div>
       </div>
     </div>
@@ -94,77 +101,91 @@ export default {
     return {
       fileList: [
         {
-          id: "1",
+          id: 1,
           imgsrc: require("../assets/file_img.png"),
           themename: "电磁场",
+          deleted: 0,
         },
         {
-          id: "2",
+          id: 2,
           imgsrc: require("../assets/file_img.png"),
           themename: "通信电子线路",
+          deleted: 0,
         },
         {
-          id: "3",
+          id: 3,
           imgsrc: require("../assets/file_img.png"),
           themename: "通信原理",
+          deleted: 0,
         },
         {
-          id: "4",
+          id: 4,
           imgsrc: require("../assets/file_img.png"),
           themename: "计算机网络技术",
+          deleted: 0,
         },
         {
-          id: "5",
+          id: 5,
           imgsrc: require("../assets/file_img.png"),
           themename: "数字信号处理",
+          deleted: 0,
         },
         {
-          id: "6",
+          id: 6,
           imgsrc: require("../assets/file_img.png"),
           themename: "软件课设",
+          deleted: 0,
         },
         {
-          id: "7",
+          id: 7,
           imgsrc: require("../assets/file_img.png"),
           themename: "JAVA",
+          deleted: 0,
         },
       ],
 
       goodsList: [
         {
-          id: "1",
+          id: 1,
           imgsrc: require("../assets/file_img.png"),
           themename: "电磁场",
+          deleted: 0,
         },
         {
-          id: "2",
+          id: 2,
           imgsrc: require("../assets/file_img.png"),
           themename: "通信电子线路",
+          deleted: 0,
         },
         {
-          id: "3",
+          id: 3,
           imgsrc: require("../assets/file_img.png"),
           themename: "通信原理",
+          deleted: 0,
         },
         {
-          id: "4",
+          id: 4,
           imgsrc: require("../assets/file_img.png"),
           themename: "计算机网络技术",
+          deleted: 0,
         },
         {
-          id: "5",
+          id: 5,
           imgsrc: require("../assets/file_img.png"),
           themename: "数字信号处理",
+          deleted: 0,
         },
         {
-          id: "6",
+          id: 6,
           imgsrc: require("../assets/file_img.png"),
           themename: "软件课设",
+          deleted: 0,
         },
         {
-          id: "7",
+          id: 7,
           imgsrc: require("../assets/file_img.png"),
           themename: "JAVA",
+          deleted: 0,
         },
       ], //所有的数据
       keywords: "", //input框绑定的关键字
@@ -172,18 +193,8 @@ export default {
       data: [], //实时的搜索的数据
       searchHistory: [], //搜索记录
 
-      dialogFormVisible: false,
-
-      fileList2: [
-        {
-          name: "mindmap.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "mindmap2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-      ],
+      editNameVisible: false,
+      deleteFileVisible: false,
     };
   },
   created() {
@@ -212,15 +223,8 @@ export default {
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
-    goback() {
-      this.$router.replace("/files");
-    },
     openfile() {
       this.$router.push("/mindmap");
-    },
-    gotolink() {
-      // this.$router.replace('/upload');
-      this.dialogFormVisible = true;
     },
     search() {
       // 每次搜索前 把之前的数据清空
@@ -253,8 +257,49 @@ export default {
       // 小bug，返回input框后应该再进行一次查询
       this.search();
     },
-    goback() {
-      this.$router.replace("/files");
+    // 重命名
+    editName(item) {
+      console.log(item);
+      this.$prompt("重命名", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputValue: item.themename,
+      })
+        .then(({ value }) => {
+          (item.themename = value),
+            this.$message({
+              type: "success",
+              message: "修改成功 ",
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消修改",
+          });
+        });
+    },
+    // 删除
+    deleteFile(item) {
+      console.log(item);
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          item.deleted = 1;
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
   },
 };
@@ -280,29 +325,24 @@ export default {
 
 .file-list {
   margin-top: 20px;
-  text-align: left;
+  text-align: center;
   vertical-align: top;
 }
 
 .file-list-item {
-  width: 220px;
   cursor: pointer;
   display: inline-block;
   position: relative;
-  margin-right: 39px;
+  margin-right: 35px;
   margin-bottom: 15px;
-}
-
-.file-name {
-  text-align: center;
 }
 
 .inputBox {
   width: 40px;
   height: 40px;
   position: absolute;
-  top: 15.5%;
-  left: 92%;
+  top: 10.8%;
+  left: 96%;
 }
 
 .inputBox .search {
@@ -413,5 +453,16 @@ export default {
 .inputBox input::placeholder {
   color: #777;
   opacity: 0.8;
+}
+
+//卡片
+.button {
+  padding: 0;
+  float: right;
+}
+
+.image {
+  width: 100%;
+  display: block;
 }
 </style>

@@ -15,9 +15,47 @@
         <el-row class="tac">
           <el-col>
             <!-- 新增按钮 -->
-            <el-button type="primary" class="new" @click="createFile"
-              >新建</el-button
+            <span
+              ><el-button type="primary" class="new" @click="createFile"
+                >新建</el-button
+              ></span
             >
+            <el-button type="success" class="new" @click="gotolink"
+              >上传</el-button
+            >
+
+            <el-dialog title="上传本地文件" :visible.sync="dialogFormVisible">
+              <el-form
+                ref="form"
+                :model="form"
+                :rules="rules"
+                label-width="80px"
+              >
+                <el-form-item label="请选择文件" label-width="100px">
+                  <el-upload
+                    class="upload-demo"
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :before-remove="beforeRemove"
+                    multiple
+                    :limit="3"
+                    :on-exceed="handleExceed"
+                    :file-list="fileList2"
+                  >
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <!-- <div slot="tip" class="el-upload__tip"><h3>只能上传jpg/png文件,且不超过500kb</h3></div> -->
+                  </el-upload>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false"
+                  >确 定</el-button
+                >
+              </div>
+            </el-dialog>
+
             <!-- 选项菜单 -->
             <el-menu
               default-active="$route.path"
@@ -42,19 +80,6 @@
                 <i class="el-icon-user"></i>
                 <span slot="title">用户中心</span>
               </el-menu-item>
-              <!-- 一、二级目录 -->
-              <el-submenu index="7">
-                <template slot="title">
-                  <i class="el-icon-more"></i>
-                  <span>其他</span>
-                </template>
-                <el-menu-item index="/upload"
-                  ><i class="el-icon-upload"></i>上传</el-menu-item
-                >
-                <el-menu-item index="7-2"
-                  ><i class="el-icon-upload2"></i>导出</el-menu-item
-                >
-              </el-submenu>
             </el-menu>
           </el-col>
         </el-row>
@@ -72,7 +97,20 @@
 import router from "@/router";
 export default {
   data() {
-    return {};
+    return {
+      dialogFormVisible: false,
+
+      fileList2: [
+        {
+          name: "mindmap.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+        {
+          name: "mindmap2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+      ],
+    };
   },
   created() {},
   methods: {
@@ -85,6 +123,10 @@ export default {
     createFile() {
       this.$router.push("/mindmap");
     },
+
+    gotolink() {
+      this.dialogFormVisible = true;
+    },
   },
 };
 </script>
@@ -92,7 +134,6 @@ export default {
 <style lang="less" scoped>
 .home-container {
   height: 100%;
-  width: 100%;
 }
 
 .el-header {
@@ -106,10 +147,12 @@ export default {
   border-bottom-style: double;
   border-width: 2px;
   border-color: rgb(241, 187, 192);
+
   > img {
     width: 120px;
     height: 34.362px;
   }
+
   > span {
     margin-right: 150px;
   }
@@ -134,6 +177,14 @@ export default {
 }
 
 .new {
+  margin-top: 20px;
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  justify-content: center;
+}
+
+.new1 {
   margin-top: 20px;
   width: 120px;
   height: 40px;
