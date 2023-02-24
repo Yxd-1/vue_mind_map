@@ -2,11 +2,16 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
+// import API from './api/axios'
 // 导入全局样式表
 import './assets/css/global.css'
 // 导入思维导图插件
-import ZmTreeOrg from 'zm-tree-org';
-import "zm-tree-org/lib/zm-tree-org.css";
+// import ZmTreeOrg from 'zm-tree-org';
+// import "zm-tree-org/lib/zm-tree-org.css";
+// import 'jsmind/style/jsmind.css'
+// import jsMind from 'jsmind/js/jsmind.js'
+// require('jsmind/js/jsmind.draggable-node.js')
+// require('jsmind/js/jsmind.screenshot.js')
 
 import axios from 'axios'
 // 配置请求的根路径
@@ -18,10 +23,12 @@ axios.interceptors.request.use(config => {
   return config
 })
 Vue.prototype.$http = axios
+// Vue.prototype.$API = API
 
 Vue.config.productionTip = false
 
-Vue.use(ZmTreeOrg);
+// Vue.use(ZmTreeOrg);
+// Vue.use(jsMind);
 
 // // 告诉服务器去哪里找静态资源文件
 // const path = require('path');

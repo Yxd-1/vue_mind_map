@@ -8,8 +8,13 @@
 <script>
 export default {
   name: "app",
+  // components: {
+  //   // Demo,
+  //   JsMind
+  // }
 };
 </script>
 
-<style>
+<style lang="less">
+// @import "assets/css/reset.less";
 </style>
