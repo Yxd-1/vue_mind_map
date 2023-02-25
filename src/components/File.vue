@@ -41,8 +41,8 @@
         <div style="width: 220px" v-if="fileListItem.deleted == 0">
           <el-card :body-style="{ padding: '0px' }">
             <img
-              :src="fileListItem.imgsrc"
-              @click="openfile"
+              :src="imgsrc"
+              @click="openfile(fileListItem.id)"
               class="image"
               alt=""
             />
@@ -55,7 +55,7 @@
             >
               <span
                 ><i class="el-icon-share"></i>
-                <label>{{ fileListItem.themename }}</label></span
+                <label>{{ fileListItem.theme }}</label></span
               >
               <el-popover placement="right" width="160" trigger="click">
                 <div
@@ -103,88 +103,89 @@ export default {
         {
           id: 1,
           imgsrc: require("../assets/file_img.png"),
-          themename: "电磁场",
+          theme: "电磁场",
           deleted: 0,
         },
         {
           id: 2,
           imgsrc: require("../assets/file_img.png"),
-          themename: "通信电子线路",
+          theme: "通信电子线路",
           deleted: 0,
         },
         {
           id: 3,
           imgsrc: require("../assets/file_img.png"),
-          themename: "通信原理",
+          theme: "通信原理",
           deleted: 0,
         },
         {
           id: 4,
           imgsrc: require("../assets/file_img.png"),
-          themename: "计算机网络技术",
+          theme: "计算机网络技术",
           deleted: 0,
         },
         {
           id: 5,
           imgsrc: require("../assets/file_img.png"),
-          themename: "数字信号处理",
+          theme: "数字信号处理",
           deleted: 0,
         },
         {
           id: 6,
           imgsrc: require("../assets/file_img.png"),
-          themename: "软件课设",
+          theme: "软件课设",
           deleted: 0,
         },
         {
           id: 7,
           imgsrc: require("../assets/file_img.png"),
-          themename: "JAVA",
+          theme: "JAVA",
           deleted: 0,
         },
       ],
+      imgsrc: require("../assets/file_img.png"),
 
       goodsList: [
         {
           id: 1,
           imgsrc: require("../assets/file_img.png"),
-          themename: "电磁场",
+          theme: "电磁场",
           deleted: 0,
         },
         {
           id: 2,
           imgsrc: require("../assets/file_img.png"),
-          themename: "通信电子线路",
+          theme: "通信电子线路",
           deleted: 0,
         },
         {
           id: 3,
           imgsrc: require("../assets/file_img.png"),
-          themename: "通信原理",
+          theme: "通信原理",
           deleted: 0,
         },
         {
           id: 4,
           imgsrc: require("../assets/file_img.png"),
-          themename: "计算机网络技术",
+          theme: "计算机网络技术",
           deleted: 0,
         },
         {
           id: 5,
           imgsrc: require("../assets/file_img.png"),
-          themename: "数字信号处理",
+          theme: "数字信号处理",
           deleted: 0,
         },
         {
           id: 6,
           imgsrc: require("../assets/file_img.png"),
-          themename: "软件课设",
+          theme: "软件课设",
           deleted: 0,
         },
         {
           id: 7,
           imgsrc: require("../assets/file_img.png"),
-          themename: "JAVA",
+          theme: "JAVA",
           deleted: 0,
         },
       ], //所有的数据
@@ -198,15 +199,18 @@ export default {
     };
   },
   created() {
-    // this.getFileList();
+    this.getFileList();
   },
   methods: {
     // 查询文件列表
-    // async getFileList() {
-    //   const { data: res } = await this.$http.get("files");
-    //   if (res.code !== 1) return this.$message.error(res.msg);
-    //   this.fileList = res.data;
-    // },
+    async getFileList() {
+      const { data: res } = await this.$http.get("themes");
+      console.log(res);
+      if (res.code !== 1) return this.$message.error(res.msg);
+      this.fileList = res.data;
+      this.goodsList = res.data;
+      // console.log(this.fileList);
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -223,15 +227,22 @@ export default {
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
-    openfile() {
-      this.$router.push("/mindmap");
+    // 传给思维导图id参数
+    openfile(id) {
+      console.log("file组件传输的参数" + id);
+      this.$router.push({
+        name: "MindMap",
+        params: {
+          id: id,
+        },
+      });
     },
     search() {
       // 每次搜索前 把之前的数据清空
       this.result = [];
       // 遍历拿到item，并判断值是否和input框相似，一样就添加到result数组中
       this.goodsList.map((item, index) => {
-        if (item.themename.includes(this.keywords)) {
+        if (item.theme.includes(this.keywords)) {
           this.result.push(item);
         }
       });
@@ -263,14 +274,17 @@ export default {
       this.$prompt("重命名", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputValue: item.themename,
+        inputValue: item.theme,
       })
-        .then(({ value }) => {
-          (item.themename = value),
+        .then(async ({ value }) => {
+          item.theme = value;
+          const { data: res } = await this.$http.put("/themes", item);
+          if(res.code == 1){
             this.$message({
               type: "success",
               message: "修改成功 ",
             });
+          }
         })
         .catch(() => {
           this.$message({
@@ -287,12 +301,17 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       })
-        .then(() => {
+        .then(async () => {
+          console.log(item)
           item.deleted = 1;
-          this.$message({
+          const { data: res } = await this.$http.delete("/themes", {params: {id: item.id}});
+          if(res.code == 1){
+            this.$message({
             type: "success",
             message: "删除成功!",
           });
+          this.getFileList();
+          }
         })
         .catch(() => {
           this.$message({
@@ -300,6 +319,7 @@ export default {
             message: "已取消删除",
           });
         });
+      
     },
   },
 };

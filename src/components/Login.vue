@@ -82,10 +82,10 @@ export default {
     // 登录方法
     login() {
       this.$refs.loginFormRef.validate(async (valid) => {
-        // 纯前端开发时用，无需验证登录
-        window.sessionStorage.setItem("token", "kjad31413nl1123");
-        this.$router.push("/home");
-        return;
+        // // 纯前端开发时用，无需验证登录
+        // window.sessionStorage.setItem("token", "kjad31413nl1123");
+        // this.$router.push("/home");
+        // return;
 
         // console.log(valid);
         if (!valid) return;
@@ -98,7 +98,7 @@ export default {
         this.$message.success("登陆成功");
 
         // 登陆成功后保存token到客户端的sessionStorage中
-        window.sessionStorage.setItem("token", res.data.token);
+        window.sessionStorage.setItem("token", res.data);
         // 跳转
         this.$router.push("/home");
       });

@@ -159,11 +159,13 @@
 <script>
 import "jsmind/style/jsmind.css";
 import jsMind from "jsmind/js/jsmind.js";
+// import { url } from "inspector";
 window.jsMind = jsMind;
 
 require("jsmind/js/jsmind.draggable-node.js");
 require("jsmind/js/jsmind.screenshot.js");
 export default {
+  name: "mindmap",
   props: {
     showBar: {
       // 是否显示工具栏，显示启用编辑
@@ -183,6 +185,7 @@ export default {
   },
   data() {
     return {
+      id: "",
       mind: {
         /* 元数据，定义思维导图的名称、作者、版本等信息 */
         meta: {
@@ -201,7 +204,6 @@ export default {
               id: "easy", // [必选] ID, 所有节点的ID不应有重复，否则ID重复的结节将被忽略
               topic: "Easy", // [必选] 节点上显示的内容
               direction: "right", // [可选] 节点的方向，此数据仅在第一层节点上有效，目前仅支持 left 和 right 两种，默认为 right
-              expanded: true, // [可选] 该节点是否是展开状态，默认为 true
               children: [
                 { id: "easy1", topic: "Easy to show" },
                 { id: "easy2", topic: "Easy to edit" },
@@ -213,7 +215,6 @@ export default {
               id: "open",
               topic: "Open Source",
               direction: "right",
-              expanded: true,
               children: [
                 { id: "open1", topic: "on GitHub" },
                 { id: "open2", topic: "BSD License" },
@@ -322,10 +323,16 @@ export default {
       },
     };
   },
-  created() {},
+  created() {
+    // console.log("mindmap组件得到的参数"+this.$route.params.id);
+    this.id = this.$route.params.id;
+    // console.log(this.id);
+  },
   mounted() {
-    this.jm = jsMind.show(this.options, this.mind);
-    // this.getData();
+    // console.log("mindmap组件得到的参数"+this.$route.params.data);
+    // console.log(this.id);
+    // this.jm = jsMind.show(this.options, this.mind);
+    this.getData();
     this.mouseWheel();
     this.mouseDrag();
   },
@@ -356,17 +363,24 @@ export default {
       }
     },
     upload() {},
-    getData() {
-      this.$API({
-        name: "getMind",
-      })
-        .then((res) => {
-          this.mind = res.data;
-          this.open_empty();
-        })
-        .catch((error) => {
-          this.$message.error(error);
-        });
+    // 初始化，得到数据
+    async getData() {
+      if (null == this.id) {
+        this.jm = jsMind.show(this.options, this.mind);
+        return;
+      }
+      const { data: res } = await this.$http.get("/nodes", {
+        params: { id: this.id },
+      });
+      console.log("mindmap res:");
+      console.log(res);
+      if (res.code !== 1) return this.$message.error(res.msg);
+      this.mind = this.mind;
+      this.mind.data.id = res.data[0].id;
+      this.mind.data.topic = res.data[0].topic;
+      this.mind.data.children = res.data[0].children;
+      console.log(this.mind);
+      this.open_empty();
     },
     open_empty() {
       const options = {
@@ -409,12 +423,33 @@ export default {
         this.jm.resize();
       };
     },
-    save_nodearray_file() {
-      const mindData = this.jm.get_data("node_array");
-      const mindName = mindData.meta.name;
-      const mindStr = jsMind.util.json.json2string(mindData);
-      jsMind.util.file.save(mindStr, "text/jsmind", mindName + ".jm");
-      console.log(jsMind);
+    // 保存
+    async save_nodearray_file() {
+      console.log(this.jm.get_data("node_tree"));
+      var meta = this.jm.get_data("node_tree");
+      var new_data = this.loopData(meta.data);
+      const data = {
+        id: new_data.id,
+        topic: new_data.topic,
+        direction: "right",
+        expanded: true,
+        rid: new_data.id,
+        pid: 0,
+        level: 1,
+        color: 0,
+        note: null,
+        deleted: 0,
+        children: new_data.children,
+      };
+      const { data: res } = await this.$http.post("/nodes", data);
+      console.log(res);
+      if (res.code != 1) return this.$message.error(res.data);
+      this.$message.success(res.data);
+      // const mindData = this.jm.get_data("node_array");
+      // const mindName = mindData.meta.name;
+      // const mindStr = jsMind.util.json.json2string(mindData);
+      // jsMind.util.file.save(mindStr, "text/jsmind", mindName + ".jm");
+      // console.log(jsMind);
     },
     screen_shot() {
       this.jm.screenshot.shootDownload();
@@ -591,12 +626,14 @@ export default {
         return;
       }
       let nodeid = jsMind.util.uuid.newid();
+      // let hashid = this.uuid_hashCode(nodeid);
       let topic = "new Node";
       let newNode = this.jm.add_node(selectedNode, nodeid, topic);
       if (newNode) {
         this.jm.select_node(nodeid);
         this.jm.begin_edit(nodeid);
       }
+      console.log(this.jm.get_data("node_tree").data);
     },
     // 新增兄弟节点
     addBrotherNode() {
@@ -611,13 +648,47 @@ export default {
         });
         return;
       }
+
       let nodeid = jsMind.util.uuid.newid();
+      // let hashid = this.uuid_hashCode(nodeid);
       let topic = "new Node";
       let newNode = this.jm.insert_node_after(selectedNode, nodeid, topic);
       if (newNode) {
         this.jm.select_node(nodeid);
         this.jm.begin_edit(nodeid);
       }
+      console.log(this.jm.get_data("node_tree").data);
+    },
+    // 遍历节点，将整数id保留，将uuid转为hashcode，同时规范数据
+    loopData(data) {
+      const stack = [data];
+      while (stack.length > 0) {
+        const node = stack.pop();
+        // 对当前节点进行操作
+        node.rid = this.id;
+        var hashcode = this.uuid_hashCode(node.id);
+        node.id = hashcode == 0 ? node.id : hashcode;
+        // 将子节点依次压入栈中（如果有子节点）
+        if (node.children && node.children.length > 0) {
+          for (let i = node.children.length - 1; i >= 0; i--) {
+            node.children[i].pid = node.id;
+            stack.push(node.children[i]);
+          }
+        }
+      }
+      return data;
+    },
+
+    // uuid转为hashcode，即转为可用id
+    uuid_hashCode(uuid) {
+      var hash = 0;
+      for (var i = 0; i < uuid.length; i++) {
+        var char = uuid.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      // 转为无符号数
+      return hash >=0 ? hash : -hash;
     },
     // 获取选中标签的 ID
     get_selected_nodeid() {
@@ -630,6 +701,8 @@ export default {
     },
     // 删除节点
     removeNode() {
+      console.log("jm getdata");
+      console.log(this.jm.get_data("node_tree"));
       let selectedId = this.get_selected_nodeid();
       if (!selectedId) {
         this.$message({
@@ -638,7 +711,9 @@ export default {
         });
         return;
       }
+      this.jm.get_node(selectedId).deleted = 1;
       this.jm.remove_node(selectedId);
+      console.log(this.jm.get_data("node_tree"));
     },
     // 编辑节点
     editNode() {

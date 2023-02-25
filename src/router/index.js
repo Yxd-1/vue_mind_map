@@ -39,7 +39,7 @@ const router = new VueRouter({
       ],
     },
     { path: "/register", component: Register },
-    { path: "/mindmap", component: MindMap },
+    { path: "/mindmap",name:"MindMap", component: MindMap },
   ],
 });
 
