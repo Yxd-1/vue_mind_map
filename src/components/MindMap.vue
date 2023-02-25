@@ -82,23 +82,41 @@
       <el-button
         @click="screen_shot"
         type="primary"
-        icon="el-icon-upload2"
+        icon="el-icon-download"
         size="medium"
         >导出</el-button
       >
-      <el-button @click="save_nodearray_file" size="medium">保存</el-button>
-      <el-button @click="get_nodearray_data" size="medium">获取数据</el-button>
+      <el-button
+        @click="upload"
+        icon="el-icon-upload2"
+        type="success"
+        size="medium"
+        >上传</el-button
+      >
+      <el-button
+        @click="save_nodearray_file"
+        size="medium"
+        icon="el-icon-upload"
+        type="success"
+        plain
+        >保存</el-button
+      >
       <el-button @click="addNode" size="medium">新增节点</el-button>
       <el-button @click="addBrotherNode" size="medium">新增兄弟节点</el-button>
       <el-button @click="editNode" size="medium">编辑节点</el-button>
       <el-button @click="removeNode" size="medium">删除节点</el-button>
-      <el-button @click="zoomIn" size="medium" :disabled="isZoomIn"
+      <el-button
+        @click="zoomIn"
+        size="medium"
+        :disabled="isZoomIn"
+        icon="el-icon-zoom-in"
         >放大</el-button
       >
       <el-button
         @click="zoomOut"
         size="medium"
         :disabled="isZoomOut"
+        icon="el-icon-zoom-out"
         class="pad"
         >缩小</el-button
       >
@@ -148,6 +166,34 @@
         >
         </el-option>
       </el-select>
+
+      <el-dialog
+        title="上传本地文件"
+        :visible.sync="dialogFormVisible"
+        :center=false
+      >
+        <el-form ref="form" :model="fileForm" label-width="80px">
+          <el-form-item label="请选择文件" label-width="100px">
+            <el-upload
+              class="upload-demo"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :on-change= "beforeUpload"
+              :file-list="fileList"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+              <!-- <div slot="tip" class="el-upload__tip"><h3>只能上传jpg/png文件,且不超过500kb</h3></div> -->
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="dialogFormVisible = false"
+            >确 定</el-button
+          >
+        </div>
+      </el-dialog>
+
+
     </div>
 
     <!-- 思维导图界面 -->
@@ -185,7 +231,7 @@ export default {
   },
   data() {
     return {
-      id: "",
+      rid: "",
       mind: {
         /* 元数据，定义思维导图的名称、作者、版本等信息 */
         meta: {
@@ -286,7 +332,7 @@ export default {
         { value: "left", label: "左边" },
         { value: "right", label: "右边" },
       ],
-      type: "right",
+      type: "full",
       options: {
         container: "jsmind_container", // 必选，容器ID
         editable: this.showBar, // 可选，是否启用编辑
@@ -321,11 +367,25 @@ export default {
         },
         mode: "full", // 显示模式，子节点只分布在根节点右侧
       },
+      dialogFormVisible: false,
+      fileForm: {},
+      centerProps: false,
+
+      fileList: [
+        {
+          name: "mindmap.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+        {
+          name: "mindmap2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+      ],
     };
   },
   created() {
     // console.log("mindmap组件得到的参数"+this.$route.params.id);
-    this.id = this.$route.params.id;
+    this.rid = this.$route.params.id;
     // console.log(this.id);
   },
   mounted() {
@@ -334,7 +394,9 @@ export default {
     // this.jm = jsMind.show(this.options, this.mind);
     this.getData();
     this.mouseWheel();
-    this.mouseDrag();
+    setTimeout(() => {
+      this.mouseDrag();
+    }, 1000);
   },
   methods: {
     // 返回主页
@@ -362,15 +424,17 @@ export default {
         return false;
       }
     },
-    upload() {},
+    upload() {
+      this.dialogFormVisible = true;
+    },
     // 初始化，得到数据
     async getData() {
-      if (null == this.id) {
+      if (null == this.rid) {
         this.jm = jsMind.show(this.options, this.mind);
         return;
       }
       const { data: res } = await this.$http.get("/nodes", {
-        params: { id: this.id },
+        params: { id: this.rid },
       });
       console.log("mindmap res:");
       console.log(res);
@@ -425,6 +489,7 @@ export default {
     },
     // 保存
     async save_nodearray_file() {
+      console.log("saveFile:")
       console.log(this.jm.get_data("node_tree"));
       var meta = this.jm.get_data("node_tree");
       var new_data = this.loopData(meta.data);
@@ -433,7 +498,7 @@ export default {
         topic: new_data.topic,
         direction: "right",
         expanded: true,
-        rid: new_data.id,
+        rid: this.rid,
         pid: 0,
         level: 1,
         color: 0,
@@ -442,7 +507,7 @@ export default {
         children: new_data.children,
       };
       const { data: res } = await this.$http.post("/nodes", data);
-      console.log(res);
+      // console.log(res);
       if (res.code != 1) return this.$message.error(res.data);
       this.$message.success(res.data);
       // const mindData = this.jm.get_data("node_array");
@@ -633,7 +698,7 @@ export default {
         this.jm.select_node(nodeid);
         this.jm.begin_edit(nodeid);
       }
-      console.log(this.jm.get_data("node_tree").data);
+      // console.log(this.jm.get_data("node_tree").data);
     },
     // 新增兄弟节点
     addBrotherNode() {
@@ -657,7 +722,7 @@ export default {
         this.jm.select_node(nodeid);
         this.jm.begin_edit(nodeid);
       }
-      console.log(this.jm.get_data("node_tree").data);
+      // console.log(this.jm.get_data("node_tree").data);
     },
     // 遍历节点，将整数id保留，将uuid转为hashcode，同时规范数据
     loopData(data) {
@@ -665,7 +730,7 @@ export default {
       while (stack.length > 0) {
         const node = stack.pop();
         // 对当前节点进行操作
-        node.rid = this.id;
+        node.rid = this.rid;
         var hashcode = this.uuid_hashCode(node.id);
         node.id = hashcode == 0 ? node.id : hashcode;
         // 将子节点依次压入栈中（如果有子节点）
@@ -688,7 +753,7 @@ export default {
         hash = hash & hash; // Convert to 32bit integer
       }
       // 转为无符号数
-      return hash >=0 ? hash : -hash;
+      return hash >= 0 ? hash : -hash;
     },
     // 获取选中标签的 ID
     get_selected_nodeid() {
@@ -701,8 +766,8 @@ export default {
     },
     // 删除节点
     removeNode() {
-      console.log("jm getdata");
-      console.log(this.jm.get_data("node_tree"));
+      // console.log("jm getdata");
+      // console.log(this.jm.get_data("node_tree"));
       let selectedId = this.get_selected_nodeid();
       if (!selectedId) {
         this.$message({
@@ -713,7 +778,7 @@ export default {
       }
       this.jm.get_node(selectedId).deleted = 1;
       this.jm.remove_node(selectedId);
-      console.log(this.jm.get_data("node_tree"));
+      // console.log(this.jm.get_data("node_tree"));
     },
     // 编辑节点
     editNode() {

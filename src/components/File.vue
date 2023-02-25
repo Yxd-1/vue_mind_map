@@ -42,7 +42,7 @@
           <el-card :body-style="{ padding: '0px' }">
             <img
               :src="imgsrc"
-              @click="openfile(fileListItem.id)"
+              @click="openfile(fileListItem)"
               class="image"
               alt=""
             />
@@ -228,14 +228,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     // 传给思维导图id参数
-    openfile(id) {
-      console.log("file组件传输的参数" + id);
-      this.$router.push({
+    async openfile(item) {
+      console.log("file组件传输的参数" + item.id);
+      const { data: res } = await this.$http.put("themes", item);
+      if (res.code == 1) {
+        this.$router.push({
         name: "MindMap",
         params: {
-          id: id,
+          id: item.id,
         },
       });
+      }
     },
     search() {
       // 每次搜索前 把之前的数据清空
@@ -264,8 +267,6 @@ export default {
     // kw就是传过来的值item，意思就是点击历史记录的词，会重新返回到input输入框
     ressetSearch(kw) {
       this.keywords = kw;
-
-      // 小bug，返回input框后应该再进行一次查询
       this.search();
     },
     // 重命名
@@ -284,6 +285,7 @@ export default {
               type: "success",
               message: "修改成功 ",
             });
+          this.getFileList();
           }
         })
         .catch(() => {

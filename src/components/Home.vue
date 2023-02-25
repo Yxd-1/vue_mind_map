@@ -11,10 +11,10 @@
         <el-row class="tac">
           <el-col>
             <!-- 新增按钮 -->
-            <span><el-button type="primary" class="new" @click="gotolink2">新建</el-button></span>
-            <el-button type="success" class="new" @click="gotolink">上传</el-button>
+            <span><el-button type="primary" class="new" @click="gotolink">新建</el-button></span>
+            <!-- <el-button type="success" class="new" @click="gotolink">上传</el-button> -->
 
-            <el-dialog title="新建文件" :visible.sync="dialogForm2Visible" center="false">
+            <el-dialog title="新建文件" :visible.sync="dialogFormVisible" :center = false>
               <el-form :model="addfileForm" label-width="120px">
                 <el-form-item label="文件主题" label-width="120px">
                   <el-select v-model="region" placeholder="请选择文件主题">
@@ -27,25 +27,8 @@
                 </el-form-item>
               </el-form>
               <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogForm2Visible = false">取 消</el-button>
-                <el-button type="primary" @click="createFile">确 定</el-button>
-              </div>
-            </el-dialog>
-
-            <el-dialog title="上传本地文件" :visible.sync="dialogFormVisible" center="false">
-              <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                <el-form-item label="请选择文件" label-width="100px">
-                  <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                    :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                    :limit="3" :on-exceed="handleExceed" :file-list="fileList2">
-                    <el-button size="small" type="primary">点击上传</el-button>
-                    <!-- <div slot="tip" class="el-upload__tip"><h3>只能上传jpg/png文件,且不超过500kb</h3></div> -->
-                  </el-upload>
-                </el-form-item>
-              </el-form>
-              <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                <el-button type="primary" @click="createFile">确 定</el-button>
               </div>
             </el-dialog>
 
@@ -86,19 +69,6 @@ export default {
   data() {
     return {
       dialogFormVisible: false,
-      dialogForm2Visible: false,
-
-      fileList2: [
-        {
-          name: "mindmap.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "mindmap2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-      ],
-
       region: '',
       addfileForm: {
         id: '',
@@ -117,21 +87,24 @@ export default {
 
     // 新建文件
     async createFile() {
+      this.dialogFormVisible = false;
       const { data: res } = await this.$http.post("themes", this.addfileForm);
       if (res.code != 1) {
         this.$message.error(res.code);
-        this.$router.push("/files");
+        this.$router.push("/welcome");
+        setTimeout(() => {
+          this.$router.push("/files");
+        }, 100);
       }
       this.$message.success("新增成功");
-      this.$router.push("/files");
+      this.$router.push("/welcome");
+      setTimeout(() => {
+        this.$router.push("/files");
+      }, 100);
     },
 
     gotolink() {
       this.dialogFormVisible = true;
-    },
-
-    gotolink2() {
-      this.dialogForm2Visible = true;
     },
   },
 };
