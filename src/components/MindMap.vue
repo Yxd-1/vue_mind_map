@@ -170,14 +170,14 @@
       <el-dialog
         title="上传本地文件"
         :visible.sync="dialogFormVisible"
-        :center=false
+        :center="false"
       >
         <el-form ref="form" :model="fileForm" label-width="80px">
           <el-form-item label="请选择文件" label-width="100px">
             <el-upload
               class="upload-demo"
               action="https://jsonplaceholder.typicode.com/posts/"
-              :on-change= "beforeUpload"
+              :on-change="beforeUpload"
               :file-list="fileList"
             >
               <el-button size="small" type="primary">点击上传</el-button>
@@ -192,8 +192,6 @@
           >
         </div>
       </el-dialog>
-
-
     </div>
 
     <!-- 思维导图界面 -->
@@ -489,7 +487,7 @@ export default {
     },
     // 保存
     async save_nodearray_file() {
-      console.log("saveFile:")
+      console.log("saveFile:");
       console.log(this.jm.get_data("node_tree"));
       var meta = this.jm.get_data("node_tree");
       var new_data = this.loopData(meta.data);

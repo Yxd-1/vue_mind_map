@@ -98,6 +98,7 @@ export default {
       }
       this.$message.success("新增成功");
       this.$router.push("/welcome");
+      this.addfileForm.theme = '';
       setTimeout(() => {
         this.$router.push("/files");
       }, 100);
